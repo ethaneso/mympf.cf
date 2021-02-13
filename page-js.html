@@ -1,0 +1,279 @@
+<script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var elems = document.querySelectorAll('select');
+      var instances = M.FormSelect.init(elems);
+  });
+
+    document.getElementById("pnameid").addEventListener("change",getReturn);
+
+// update return list
+     function getReturn(){
+     var getReturnCode = document.getElementById("pnameid").value;
+     google.script.run.withSuccessHandler(updateRetrunCode).updateReturn(getReturnCode);
+      function updateRetrunCode(returnValue){
+      document.getElementById("returnamtid").value = returnValue[0];
+      document.getElementById("riskamtid").value = returnValue[1];
+      M.updateTextFields();
+    }
+    }
+
+
+// check the empty input
+    function checkEmptyInput()
+    {
+    var isEmpty = false,
+    schName = document.getElementById("pnameid").value,
+    invAmt = document.getElementById("investamtid").value,
+    invRisk = document.getElementById("riskamtid").value,
+    invReturn = document.getElementById("returnamtid").value;
+    
+    if(schName === "強積金計劃"){
+    document.getElementById("mpfTitle").style.color="red";
+    isEmpty = true;
+    }
+    else if(invAmt === "" | invAmt < 1 ){
+    document.getElementById("mpfAmt").style.color="red";
+    document.getElementById("investamtid").style.borderColor="red";
+    document.getElementById("mpfTitle").style.color="";
+    isEmpty = true;
+    }
+    return isEmpty;   
+    }
+    
+    
+var rIndex,
+    table = document.getElementById("tableid");
+var sumVal = 0;
+var totalRisk = 0;
+var totalReturn = 0;
+var eScore = 0;
+
+// add Row
+function addHtmlTableRow()
+{
+  if(!checkEmptyInput()){
+    // get the table by id
+    // create a new row and cells
+    // get value from input text
+    // set the values into row cell's
+    
+    var newRow = table.insertRow(table.length),
+        cell0 = newRow.insertCell(0),
+        cell1 = newRow.insertCell(1),
+        cell2 = newRow.insertCell(2),
+        cell3 = newRow.insertCell(3),
+        cell4 = newRow.insertCell(4),
+        cell5 = newRow.insertCell(5),
+        cell6 = newRow.insertCell(6);
+
+        var td = document.createElement('td'); 
+        var td = newRow.insertCell(7);
+        var button = document.createElement('input');
+
+                // SET INPUT ATTRIBUTE.
+                button.setAttribute('type', 'button');
+                button.setAttribute('value', 'Remove');
+                button.setAttribute('id', 'rm');
+
+                // ADD THE BUTTON's 'onclick' EVENT.
+                button.setAttribute('onclick', 'removeSelectedRow()');
+
+                td.appendChild(button);
+        
+        pname = document.getElementById("pnameid").value;
+        investamt = document.getElementById("investamtid").value;
+        returnamt = document.getElementById("returnamtid").value;
+        riskamt = document.getElementById("riskamtid").value
+        
+
+    cell0.innerHTML = pname;
+    cell1.innerHTML = investamt;
+    cell2.innerHTML = returnamt;
+    cell3.innerHTML = riskamt;
+
+// empty all input
+     document.getElementById("investamtid").value = "";
+     document.getElementById("investamtid").style.borderColor="";
+     document.getElementById("mpfAmt").style.color="";
+     document.getElementById("returnamtid").value = "";
+     document.getElementById("riskamtid").value = "";
+   
+      var myAppZip = document.getElementById("pnameid");
+      myAppZip.selectedIndex = 0;
+      document.getElementById("mpfTitle").style.color="";
+      M.FormSelect.init(myAppZip);
+      
+}
+
+}
+
+
+ // remove this row
+function removeSelectedRow()
+{ 
+    for(var i = 1; i < table.rows.length; i++)
+    {
+        table.rows[i].onclick = function()
+        {
+            // get the seected row index
+            rIndex = this.rowIndex;
+            table.deleteRow(rIndex);
+        };
+    }
+}
+
+// caculate total/sum value
+function getSum()
+{
+for(var i = 1; i < table.rows.length; i++){
+sumVal  += parseInt(table.rows[i].cells[1].innerHTML);
+}
+document.getElementById("sumVid").innerHTML = sumVal;
+
+getWeighted()
+}
+
+function getWeighted(){ 
+for(var i = 1; i < table.rows.length; i++)
+    {
+        cellValue = table.rows[i].cells[1].innerHTML;
+        
+        weighted = cellValue/sumVal;
+
+        var weightedAmt = table.rows[i].cells;
+        weightedAmt[4].innerHTML =  weighted;
+
+        returnCellValue = table.rows[i].cells[2].innerHTML;
+        var weightedReturn = table.rows[i].cells;
+        weightedReturn[5].innerHTML =  weighted * returnCellValue;
+
+        riskCellValue = table.rows[i].cells[3].innerHTML;
+        var weightedRisk = table.rows[i].cells;
+        weightedRisk[6].innerHTML =  weighted * riskCellValue;
+        
+    }
+
+}
+
+ function round(value, decimals) {
+    return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+ }
+
+
+// calculate socre
+function calScore()
+{
+    var iRisk = document.getElementById("iRisk").value;
+    getSum();
+
+    for(var i = 1; i < table.rows.length; i++){
+        totalRisk += parseFloat(table.rows[i].cells[6].innerHTML);
+        totalReturn += parseFloat(table.rows[i].cells[5].innerHTML);
+    }
+
+ var array = [];
+ array.push(totalReturn, iRisk, totalRisk);
+
+ google.script.run.withSuccessHandler(returnedScore).calPortfoScore(array);
+    function returnedScore(portScore) {
+      eScore = portScore;
+      let roundEScore = round(eScore, 4);
+      document.getElementById("scoreVid").innerHTML = "Score : "+roundEScore;
+      const progressS = document.querySelector('.progress-score');
+      progressS.setAttribute('data-done', roundEScore*100);
+      progressS.style.width = progressS.getAttribute('data-done') + '%';
+      progressS.style.opacity = 1;
+    }
+
+setScores()
+
+resetScores()
+}
+
+function setScores() {
+let roundRisk = round(totalRisk, 4);
+let roundReturn = round(totalReturn, 4);
+let roundEScore = round(eScore, 4);
+
+let roundRiskToFix = roundRisk*100;
+let roundReturnToFix = roundReturn*100;
+
+document.getElementById("totalRiskVid").innerHTML = "Total Risk : "+ roundRiskToFix.toFixed(2) + "%";
+document.getElementById("totalReturnVid").innerHTML = "Total Return : "+ roundReturnToFix.toFixed(2) + "%";
+
+const progress = document.querySelector('.progress-risk');
+	progress.setAttribute('data-done', roundRisk*100);
+progress.style.width = progress.getAttribute('data-done') + '%';
+progress.style.opacity = 1;
+
+const progressR = document.querySelector('.progress-return');
+	progressR.setAttribute('data-done', roundReturn*100);
+progressR.style.width = progressR.getAttribute('data-done') + '%';
+progressR.style.opacity = 1;
+
+}
+function resetScores(){
+  sumVal = 0;
+  totalRisk = 0;
+  totalReturn = 0;
+  eScore = 0;
+}
+
+    //contact
+    function checkContactEmptyInput()
+    {
+    var isEmpty = false;
+    var letters = /^[A-Za-z]+$/;
+    var validEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    var fName = document.getElementById("fn").value;
+    var lName = document.getElementById("ln").value;
+    var email = document.getElementById("app").value;
+    
+    if(!letters.test(fName)){
+    var name = document.getElementById("fn");
+    name.style.borderColor="red";
+    isEmpty = true;
+    }
+    else if(!letters.test(lName)){
+    var name = document.getElementById("ln");
+    name.style.borderColor="red";
+    var name = document.getElementById("fn");
+    name.style.borderColor="";
+    isEmpty = true;
+    }
+    else if(!validEmail.test(email)){
+    var name = document.getElementById("app");
+    name.style.borderColor="red";
+    var name = document.getElementById("ln");
+    name.style.borderColor="";
+    isEmpty = true;
+    }
+    return isEmpty;
+    }
+                
+    document.getElementById("btn").addEventListener("click",doStuff);
+    
+    function doStuff(){
+    
+    if(!checkContactEmptyInput()){
+    var userInfo = {};
+      
+      userInfo.firstName = document.getElementById("fn").value;
+      userInfo.lastName = document.getElementById("ln").value;
+      userInfo.app = document.getElementById("app").value;
+      
+      google.script.run.userClicked(userInfo);
+      document.getElementById("fn").value = "";
+      document.getElementById("fn").style.borderColor="";
+      document.getElementById("ln").value = "";
+      document.getElementById("ln").style.borderColor="";
+      document.getElementById("app").value ="";
+      document.getElementById("app").style.borderColor="";
+      
+    }
+    }
+    
+
+</script>
+
