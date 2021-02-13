@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <title>MyMPF</title>
+    <meta charset="windows-1252">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <?!= include("page-css"); ?>
+  </head>
+  <body>
+  <div class="container">
+    <form>
+      <div class="form-row">
+        <div class="col">
+        <input id="fn" type="text" class="form-control" placeholder="First name" pattern="[a-zA-Z0-9]+">
+        </div>
+        <div class="col">
+        <input id="ln" type="text" class="form-control" placeholder="Last name" pattern="[a-zA-Z0-9]+">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-12">
+        <label for="inputEmail4">Email :</label>
+        <input id="app" type="email" class="form-control" id="inputEmail4" pattern=".+@tutsplus\.com|.+@envato\.com">
+        </div>
+      </div>
+    </form>
+    <div class="form-row">
+        <button id="btn" type="button" class="btn btn-success">Stay In Touch!</button> 
+    </div> 
+  </div> <!-- contact form close -->
+  
+  <div class="container">
+      <div class="row">
+       <div class = "input-field col s4 left">
+        <label id="perRisk">個人承受風險能力 Risk Tolerance :</label>
+        <select id="iRisk" type="number" class="custom-select">
+          <option value="1">1 承受風險能力最低</option>
+          <option value="2">2 </option>
+          <option value="3">3 </option>
+          <option value="4">4 </option>
+          <option value="5">5 承受風險能力最高</option>
+        </select>
+        </div>
+       </div>
+   </div><br>
+   
+  <div class="container">
+    <div class="forminput">
+        <div class="form-group">
+          <label id="mpfTitle">強積金計劃 MPF Scheme</label>
+           <select id="pnameid"  class="custom-select">
+              <option disabled selected>強積金計劃</option>
+              <?!= list1; ?>          
+           </select> 
+          <!-- MPF Scheme Name :<input type="text" name="pname" id="pnameid" class="form-control"><br>-->
+        </div>
+        <div class="form-group">
+        <label id="mpfAmt">現持有的投資金額 Invested Amount :</label>
+        <input type="number" name="amount" min="1" id="investamtid" class="form-control"><br>
+        </div>
+        <div class="form-group">
+        回報 Return :<input disabled  type="number" name="return" id="returnamtid" class="form-control"><br>
+        </div>
+        <div class="form-group">
+        風險 Risk :<input disabled  type="number" name="risk" id="riskamtid" class="form-control"><br>
+        </div>
+        <button onclick="addHtmlTableRow();" type="button" class="btn btn-outline-success">+</button><br>
+    </div>
+   </div>
+   
+    <div class="container">
+      <div class="forminput">
+      <div class="form-group">
+      <button type="button" class="btn btn-outline-success btn-lg float-sm-left" onclick="calScore();">Analyse</button><br>
+      </div><br>
+    <div class="table-responsive">
+    <table id="tableid" class="table">
+    <tr class="thead-dark">
+    <th>MPF Scheme Name</th>
+    <th>Investment Amount</th>
+    <th>Return</th>
+    <th>Risk</th>
+    <th>weighted Amt</th>
+    <th>weighted Return</th>
+    <th>weighted Risk</th>
+    </table>
+    <div class="input-group input-group-lg">
+    <span class="input-group-text">Total: $</span>
+    <span class="btn btn-outline-secondary" id="sumVid"></span><br>
+    </div><br>
+    <span class="h5" id="totalReturnVid"></span><br>
+      <div class="progress">
+        <div class="progress-done progress-return" data-done="0">
+        </div>
+      </div>
+    <span class="h5" id="totalRiskVid"></span><br>
+      <div class="progress">
+        <div class="progress-done progress-risk" data-done="0">  
+        </div>
+      </div>
+    <span class="h5" id="scoreVid"></span><br>
+      <div class="progress">
+        <div class="progress-done progress-score" data-done="0">  
+        </div>
+      </div>
+      </div>
+      </div>
+    </div><br>
+    <p class="text-center">All info provided in this page does not intend to provide any financial advice. The score provided is only for educational purposes!</p>
+    <p class="text-center"><a href="https://www.mympf.cf/home/data-collection-policy"><b>Data Collection Policy </b></a></p>
+    
+    <p class="text-center">All rights reserved © </p>
+    <p class="text-center">***The fund price, risk, and return provided on our website is for informational purposes only and should not be relied upon for trading. Historical and current price performance is not necessarily indicative of future performance. You should not rely on the risk or return quotes provided on our website for trading and investment purposes. MyMPF does not guarantee the accuracy or completeness of any stock information, nor shall we be liable to any person for delays, inaccuracies, omissions, or errors in such data, or for any actions taken in reliance of such data, or for any damages resulting therefrom.</p>
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+    <?!= include("page-js"); ?>
+  </body>
+</html>
+
+
