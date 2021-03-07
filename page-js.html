@@ -4,9 +4,20 @@
       var elems = document.querySelectorAll('select');
       var instances = M.FormSelect.init(elems);
   });
+    document.getElementById("fundHouseName").addEventListener("change",getSchemeList);
+    
+    function getSchemeList(){
+     var houseName = document.getElementById("fundHouseName").value;
+     google.script.run.withSuccessHandler(updateSchemeList).getFundList(houseName);
+      function updateSchemeList(schemeList){
+        var select = document.getElementById("pnameid");
+        for(index in schemeList) {
+        select.options[select.options.length] = new Option(schemeList[index], schemeList[index]);
+          }
+      }
+    }
 
     document.getElementById("pnameid").addEventListener("change",getReturn);
-
 // update return list
      function getReturn(){
      var getReturnCode = document.getElementById("pnameid").value;
@@ -23,12 +34,17 @@
     function checkEmptyInput()
     {
     var isEmpty = false,
+    houseName = document.getElementById("fundHouseName").value,
     schName = document.getElementById("pnameid").value,
     invAmt = document.getElementById("investamtid").value,
     invRisk = document.getElementById("riskamtid").value,
     invReturn = document.getElementById("returnamtid").value;
     
-    if(schName === "強積金計劃"){
+    if(houseName === "強積金信托人"){
+    document.getElementById("mpfHouseName").style.color="red";
+    isEmpty = true;
+    }
+    else if(schName === "強積金計劃"){
     document.getElementById("mpfTitle").style.color="red";
     isEmpty = true;
     }
@@ -38,7 +54,7 @@
     document.getElementById("mpfTitle").style.color="";
     isEmpty = true;
     }
-    return isEmpty;   
+    return isEmpty;
     }
     
     
@@ -98,10 +114,11 @@ function addHtmlTableRow()
      document.getElementById("mpfAmt").style.color="";
      document.getElementById("returnamtid").value = "";
      document.getElementById("riskamtid").value = "";
-   
+
       var myAppZip = document.getElementById("pnameid");
       myAppZip.selectedIndex = 0;
       document.getElementById("mpfTitle").style.color="";
+      document.getElementById("mpfHouseName").style.color="";
       M.FormSelect.init(myAppZip);
       
 }
