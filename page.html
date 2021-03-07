@@ -50,10 +50,17 @@
   <div class="container">
     <div class="forminput">
         <div class="form-group">
-          <label id="mpfTitle">強積金計劃 MPF Scheme</label>
+          <label id="mpfHouseName">強積金受托人 Trustee:</label>
+           <select id="fundHouseName"  class="custom-select">
+              <option disabled selected>強積金信托人</option>
+              <?!= list1; ?>          
+           </select> 
+          <!-- MPF Scheme Name :<input type="text" name="pname" id="pnameid" class="form-control"><br>-->
+        </div>
+        <div class="form-group">
+          <label id="mpfTitle">強積金計劃 MPF Scheme :</label>
            <select id="pnameid"  class="custom-select">
               <option disabled selected>強積金計劃</option>
-              <?!= list1; ?>          
            </select> 
           <!-- MPF Scheme Name :<input type="text" name="pname" id="pnameid" class="form-control"><br>-->
         </div>
